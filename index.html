@@ -116,8 +116,8 @@
             <span class="text-xs font-bold text-slate-400 uppercase tracking-wider"><i class="fa-solid fa-route mr-1"></i> 날짜 선택</span>
             <span class="text-[10px] text-teal-600 bg-teal-50 px-2 py-0.5 rounded-md font-extrabold">터치해서 날짜별로 보세예~</span>
           </div>
-          <div class="grid grid-cols-4 gap-2" id="date-tabs-grid">
-            <!-- Rendered by JavaScript dynamically -->
+          <div class="grid grid-cols-5 gap-1.5" id="date-tabs-grid">
+            <!-- Rendered by JavaScript dynamically (5 Columns for prep + 4 days) -->
           </div>
         </div>
 
@@ -208,7 +208,7 @@
           <!-- 3. 날짜별 총합 (Daily Total Area) -->
           <div class="bg-teal-50/70 border-t border-teal-100 p-4 flex flex-col sm:flex-row justify-between items-center gap-2">
             <div class="text-center sm:text-left">
-              <span class="text-[10px] text-teal-700 font-black tracking-wider uppercase bg-teal-100 px-2 py-0.5 rounded-md" id="total-badge-date">6/17 (수) 하루 합계</span>
+              <span class="text-[10px] text-teal-700 font-black tracking-wider uppercase bg-teal-100 px-2 py-0.5 rounded-md" id="total-badge-date">하루 합계</span>
             </div>
             <div class="text-center sm:text-right">
               <span class="text-xl font-black text-teal-800" id="daily-total-twd">NT$ 0</span>
@@ -299,6 +299,8 @@
         <div>
           <label class="block text-xs font-bold text-slate-500 mb-1">지출 날짜</label>
           <select id="edit-item-date" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-teal-500 font-semibold">
+            <!-- Added prep option in edit modal select dropdown -->
+            <option value="prep">예약 및 여행준비</option>
             <option value="2026-06-17">06월 17일 (수)</option>
             <option value="2026-06-18">06월 18일 (목)</option>
             <option value="2026-06-19">06월 19일 (금)</option>
@@ -385,6 +387,9 @@
 
     // Default Fallback Mock Expenses (Used only on very first load)
     const defaultExpenses = [
+      // Day 0: 예약 및 여행준비 (prep)
+      { id: 100, date: 'prep', category: 'sightseeing', title: '대만 무제한 4G 유심칩 & 이지카드 사전 예약', amount: 450, payment: 'card' },
+      
       // Day 1 (06/17)
       { id: 1, date: '2026-06-17', category: 'hotel', title: '시먼 시티 리조트 호텔 (3박 예약분)', amount: 6800, payment: 'card' },
       { id: 2, date: '2026-06-17', category: 'transport', title: '타오위안 공항 익스프레스 MRT', amount: 150, payment: 'cash' },
@@ -413,12 +418,13 @@
     // State Data Setup (Loading from LocalStorage if available)
     const state = {
       exchangeRate: parseFloat(localStorage.getItem('taiwan_ledger_exchange_rate')) || 48.32,
-      activeTab: '2026-06-17', // '2026-06-17' | '2026-06-18' | '2026-06-19' | '2026-06-20'
+      activeTab: 'prep', // Defaults to the newly created 'prep' tab!
       expenses: JSON.parse(localStorage.getItem('taiwan_ledger_expenses')) || defaultExpenses
     };
 
-    // Constant Day details
+    // Constant Day details (Now containing 'prep' tab at the very front)
     const travelDates = [
+      { date: 'prep', label: '예약/준비', day: '준비' },
       { date: '2026-06-17', label: '6/17 (수)', day: '1일차' },
       { date: '2026-06-18', label: '6/18 (목)', day: '2일차' },
       { date: '2026-06-19', label: '6/19 (금)', day: '3일차' },
@@ -730,26 +736,34 @@
           state.activeTab = t.date;
           renderAll();
         };
-        btn.className = `flex flex-col items-center justify-center p-2.5 rounded-xl transition duration-200 border text-center ${
+        
+        // Dynamic padding and font sizing adjustments for 5 columns layout
+        btn.className = `flex flex-col items-center justify-center py-2 px-1 rounded-xl transition duration-200 border text-center ${
           isActive 
             ? 'bg-teal-600 text-white border-teal-600 shadow-md transform scale-102' 
             : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
         }`;
         
         btn.innerHTML = `
-          <span class="text-[10px] font-black ${isActive ? 'text-teal-200' : 'text-slate-400'}">${t.day}</span>
-          <span class="text-xs font-bold leading-none mt-0.5">${t.label.split(' ')[0]}</span>
-          <span class="text-[9px] font-extrabold mt-1.5 px-1.5 py-0.5 rounded-full ${
+          <span class="text-[9px] font-black tracking-tighter ${isActive ? 'text-teal-200' : 'text-slate-400'}">${t.day}</span>
+          <span class="text-[11px] font-bold leading-none mt-0.5 tracking-tight">${t.label.split(' ')[0]}</span>
+          <span class="text-[8px] sm:text-[9px] font-extrabold mt-1 py-0.5 px-1 rounded-full ${
             isActive ? 'bg-teal-500 text-white' : 'bg-slate-200 text-slate-600'
           }">${formatTWD(total).replace('NT$ ', '')}</span>
         `;
         tabsGrid.appendChild(btn);
       });
 
-      // Update Form and List Header Labels with Active Date
-      document.getElementById('form-title-date').innerHTML = `<span class="text-teal-600 font-extrabold">${activeDayData.day} (${activeDayData.label})</span> 지출 기록하기`;
-      document.getElementById('list-title-date').innerHTML = `<span class="text-teal-600 font-extrabold">${activeDayData.day} (${activeDayData.label})</span> 지출 상세 내역`;
-      document.getElementById('total-badge-date').textContent = `${activeDayData.day} (${activeDayData.label}) 하루 합계`;
+      // Customize Active Box Header Labels for Special "prep" Tab vs Standard Dates
+      if (state.activeTab === 'prep') {
+        document.getElementById('form-title-date').innerHTML = `<span class="text-teal-600 font-extrabold">예약 및 여행준비</span> 지출 기록하기`;
+        document.getElementById('list-title-date').innerHTML = `<span class="text-teal-600 font-extrabold">예약 및 여행준비</span> 지출 상세 내역`;
+        document.getElementById('total-badge-date').textContent = `예약 및 여행준비 합계`;
+      } else {
+        document.getElementById('form-title-date').innerHTML = `<span class="text-teal-600 font-extrabold">${activeDayData.day} (${activeDayData.label})</span> 지출 기록하기`;
+        document.getElementById('list-title-date').innerHTML = `<span class="text-teal-600 font-extrabold">${activeDayData.day} (${activeDayData.label})</span> 지출 상세 내역`;
+        document.getElementById('total-badge-date').textContent = `${activeDayData.day} (${activeDayData.label}) 하루 합계`;
+      }
 
       // Filter active day expenses
       const activeDayExpenses = state.expenses.filter(e => e.date === state.activeTab);
@@ -767,8 +781,8 @@
         listContainer.innerHTML = `
           <div class="flex flex-col items-center justify-center py-12 text-slate-400">
             <span class="text-2xl">🌴</span>
-            <p class="text-xs font-bold mt-1.5">이 날은 아직 돈을 안 쓰셨거나 기록이 없어예!</p>
-            <p class="text-[10px] text-slate-300">위 양식에 사용액을 입력해서 첫 소비를 적어보세예~</p>
+            <p class="text-xs font-bold mt-1.5">이 기간에는 아직 기록한 지출이 없어예!</p>
+            <p class="text-[10px] text-slate-300">위 양식에 사전 결제금액을 입력해서 소비를 적어보세예~</p>
           </div>
         `;
       } else {
