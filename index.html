@@ -132,9 +132,9 @@
             
             <form onsubmit="addNewExpense(event)" class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
               <!-- Category select -->
-              <div class="sm:col-span-3">
+              <div class="sm:col-span-2">
                 <label class="block text-xs font-bold text-slate-500 mb-1">지출 종류</label>
-                <select id="new-item-category" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-teal-500">
+                <select id="new-item-category" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2 py-2 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-teal-500">
                   <option value="food">🍔 식비</option>
                   <option value="transport">🚇 교통</option>
                   <option value="hotel">🏨 숙박</option>
@@ -145,11 +145,21 @@
               </div>
               
               <!-- Payment cash or card -->
-              <div class="sm:col-span-3">
+              <div class="sm:col-span-2">
                 <label class="block text-xs font-bold text-slate-500 mb-1">결제 방식</label>
-                <select id="new-item-payment" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-teal-500">
+                <select id="new-item-payment" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2 py-2 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-teal-500">
                   <option value="cash">💵 현금 (Cash)</option>
                   <option value="card">💳 카드 (Card)</option>
+                </select>
+              </div>
+
+              <!-- Payer select -->
+              <div class="sm:col-span-2">
+                <label class="block text-xs font-bold text-slate-500 mb-1">결제자 👤</label>
+                <select id="new-item-payer" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2 py-2 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-teal-500">
+                  <option value="jisu">👩🏻‍🦰 지수</option>
+                  <option value="bitna">👱🏻‍♀️ 빛나</option>
+                  <option value="others">👥 그 외</option>
                 </select>
               </div>
 
@@ -241,7 +251,26 @@
             <div class="bg-rose-50 border border-rose-100 p-4 rounded-xl text-center mb-5 relative overflow-hidden">
               <span class="text-[10px] text-rose-500 font-extrabold tracking-wider block uppercase">전체 누적 지출액 💸</span>
               <span class="text-2xl font-black text-rose-700 block mt-1" id="summary-spent-twd">NT$ 0</span>
-              <span class="text-xs font-bold text-rose-500 block mt-0.5" id="summary-spent-krw">₩0</span>
+              <span class="text-xs font-bold text-rose-500 block mt-0.5 border-b border-rose-200/50 pb-2.5" id="summary-spent-krw">₩0</span>
+
+              <!-- Payer Breakdown Panel Inside the summary card with custom emojis -->
+              <div class="mt-3 grid grid-cols-3 gap-1.5 text-[10px] text-slate-600 font-semibold">
+                <div class="bg-indigo-50/70 p-2 rounded-xl border border-indigo-100">
+                  <span class="block font-extrabold text-indigo-700 text-[9px]"><i class="fa-solid fa-user-large mr-0.5"></i>지수 👩🏻‍🦰</span>
+                  <span id="payer-jisu-sum" class="font-black text-indigo-900 block mt-1 text-xs">NT$ 0</span>
+                  <span id="payer-jisu-sum-krw" class="text-[8px] text-indigo-500 block">₩0</span>
+                </div>
+                <div class="bg-rose-50/70 p-2 rounded-xl border border-rose-100">
+                  <span class="block font-extrabold text-rose-700 text-[9px]"><i class="fa-solid fa-user-large mr-0.5"></i>빛나 👱🏻‍♀️</span>
+                  <span id="payer-bitna-sum" class="font-black text-rose-900 block mt-1 text-xs">NT$ 0</span>
+                  <span id="payer-bitna-sum-krw" class="text-[8px] text-rose-500 block">₩0</span>
+                </div>
+                <div class="bg-slate-100/70 p-2 rounded-xl border border-slate-200">
+                  <span class="block font-extrabold text-slate-700 text-[9px]"><i class="fa-solid fa-users mr-0.5"></i>그 외 👥</span>
+                  <span id="payer-others-sum" class="font-black text-slate-900 block mt-1 text-xs">NT$ 0</span>
+                  <span id="payer-others-sum-krw" class="text-[8px] text-slate-500 block">₩0</span>
+                </div>
+              </div>
             </div>
 
             <!-- Split Category chart stats -->
@@ -264,6 +293,19 @@
               <div class="flex justify-between text-[10px] text-slate-500 px-1 mt-1 font-semibold">
                 <span class="flex items-center gap-1"><span class="inline-block w-2.5 h-2.5 bg-amber-400 rounded-full"></span> 현금: <span id="payment-cash-total" class="font-bold">NT$ 0</span></span>
                 <span class="flex items-center gap-1"><span class="inline-block w-2.5 h-2.5 bg-blue-500 rounded-full"></span> 카드: <span id="payment-card-total" class="font-bold">NT$ 0</span></span>
+              </div>
+            </div>
+
+            <!-- [NEW] Payer Breakdown Graph Stat (Right below payment summary) -->
+            <div class="space-y-2 pt-4 border-t border-slate-100 mt-4">
+              <h4 class="text-xs font-black text-slate-700"><i class="fa-solid fa-user-group text-teal-600"></i> 결제자별 요약 그래프</h4>
+              <div class="flex h-5 rounded-lg overflow-hidden border border-slate-100 shadow-sm text-[9px] font-black text-white" id="payer-ratio-bar">
+                <!-- Dynamically populated -->
+              </div>
+              <div class="flex flex-wrap gap-x-2 gap-y-1 justify-between text-[10px] text-slate-500 px-1 mt-1 font-semibold">
+                <span class="flex items-center gap-1"><span class="inline-block w-2.5 h-2.5 bg-indigo-500 rounded-full"></span> 지수 👩🏻‍🦰: <span id="payer-jisu-ratio-val" class="font-bold">NT$ 0</span></span>
+                <span class="flex items-center gap-1"><span class="inline-block w-2.5 h-2.5 bg-rose-500 rounded-full"></span> 빛나 👱🏻‍♀️: <span id="payer-bitna-ratio-val" class="font-bold">NT$ 0</span></span>
+                <span class="flex items-center gap-1"><span class="inline-block w-2.5 h-2.5 bg-slate-400 rounded-full"></span> 그 외 👥: <span id="payer-others-ratio-val" class="font-bold">NT$ 0</span></span>
               </div>
             </div>
 
@@ -308,10 +350,10 @@
           </select>
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-3 gap-2">
           <div>
             <label class="block text-xs font-bold text-slate-500 mb-1">카테고리</label>
-            <select id="edit-item-category" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-teal-500">
+            <select id="edit-item-category" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2 py-2.5 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-teal-500">
               <option value="food">🍔 식비</option>
               <option value="transport">🚇 교통</option>
               <option value="hotel">🏨 숙박</option>
@@ -322,9 +364,17 @@
           </div>
           <div>
             <label class="block text-xs font-bold text-slate-500 mb-1">결제 수단</label>
-            <select id="edit-item-payment" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-teal-500">
+            <select id="edit-item-payment" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2 py-2.5 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-teal-500">
               <option value="cash">💵 현금 (Cash)</option>
               <option value="card">💳 카드 (Card)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 mb-1">결제자 👤</label>
+            <select id="edit-item-payer" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2 py-2.5 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-teal-500">
+              <option value="jisu">👩🏻‍🦰 지수</option>
+              <option value="bitna">👱🏻‍♀️ 빛나</option>
+              <option value="others">👥 그 외</option>
             </select>
           </div>
         </div>
@@ -388,31 +438,31 @@
     // Default Fallback Mock Expenses (Used only on very first load)
     const defaultExpenses = [
       // Day 0: 예약 및 여행준비 (prep)
-      { id: 100, date: 'prep', category: 'sightseeing', title: '대만 무제한 4G 유심칩 & 이지카드 사전 예약', amount: 450, payment: 'card' },
+      { id: 100, date: 'prep', category: 'sightseeing', title: '대만 무제한 4G 유심칩 & 이지카드 사전 예약', amount: 450, payment: 'card', payer: 'jisu' },
       
       // Day 1 (06/17)
-      { id: 1, date: '2026-06-17', category: 'hotel', title: '시먼 시티 리조트 호텔 (3박 예약분)', amount: 6800, payment: 'card' },
-      { id: 2, date: '2026-06-17', category: 'transport', title: '타오위안 공항 익스프레스 MRT', amount: 150, payment: 'cash' },
-      { id: 3, date: '2026-06-17', category: 'food', title: '아종면선 곱창국수 (큰그릇)', amount: 75, payment: 'cash' },
-      { id: 4, date: '2026-06-17', category: 'food', title: '시먼 삼형매 망고빙수', amount: 250, payment: 'cash' },
+      { id: 1, date: '2026-06-17', category: 'hotel', title: '시먼 시티 리조트 호텔 (3박 예약분)', amount: 6800, payment: 'card', payer: 'bitna' },
+      { id: 2, date: '2026-06-17', category: 'transport', title: '타오위안 공항 익스프레스 MRT', amount: 150, payment: 'cash', payer: 'jisu' },
+      { id: 3, date: '2026-06-17', category: 'food', title: '아종면선 곱창국수 (큰그릇)', amount: 75, payment: 'cash', payer: 'jisu' },
+      { id: 4, date: '2026-06-17', category: 'food', title: '시먼 삼형매 망고빙수', amount: 250, payment: 'cash', payer: 'others' },
       
       // Day 2 (06/18)
-      { id: 5, date: '2026-06-18', category: 'food', title: '딘타이펑 본점 샤오롱바오 & 우육면', amount: 980, payment: 'card' },
-      { id: 6, date: '2026-06-18', category: 'sightseeing', title: '타이베이 101 전망대 티켓 2매', amount: 1200, payment: 'card' },
-      { id: 7, date: '2026-06-18', category: 'food', title: '춘수당 밀크티 2잔', amount: 380, payment: 'cash' },
-      { id: 8, date: '2026-06-18', category: 'food', title: '스린야시장 지파이 & 편의점 맥주', amount: 230, payment: 'cash' },
+      { id: 5, date: '2026-06-18', category: 'food', title: '딘타이펑 본점 샤오롱바오 & 우육면', amount: 980, payment: 'card', payer: 'bitna' },
+      { id: 6, date: '2026-06-18', category: 'sightseeing', title: '타이베이 101 전망대 티켓 2매', amount: 1200, payment: 'card', payer: 'jisu' },
+      { id: 7, date: '2026-06-18', category: 'food', title: '춘수당 밀크티 2잔', amount: 380, payment: 'cash', payer: 'bitna' },
+      { id: 8, date: '2026-06-18', category: 'food', title: '스린야시장 지파이 & 편의점 맥주', amount: 230, payment: 'cash', payer: 'others' },
       
       // Day 3 (06/19)
-      { id: 9, date: '2026-06-19', category: 'transport', title: '예스진지 1일 버스투어 동행 비용', amount: 1600, payment: 'card' },
-      { id: 10, date: '2026-06-19', category: 'food', title: '지우펀 아메이차주관 차 체험세트', amount: 300, payment: 'cash' },
-      { id: 11, date: '2026-06-19', category: 'sightseeing', title: '스펀 천등 날리기 4색 세트', amount: 250, payment: 'cash' },
-      { id: 12, date: '2026-06-19', category: 'food', title: '광부도시락 세트', amount: 180, payment: 'cash' },
+      { id: 9, date: '2026-06-19', category: 'transport', title: '예스진지 1일 버스투어 동행 비용', amount: 1600, payment: 'card', payer: 'jisu' },
+      { id: 10, date: '2026-06-19', category: 'food', title: '지우펀 아메이차주관 차 체험세트', amount: 300, payment: 'cash', payer: 'bitna' },
+      { id: 11, date: '2026-06-19', category: 'sightseeing', title: '스펀 천등 날리기 4색 세트', amount: 250, payment: 'cash', payer: 'jisu' },
+      { id: 12, date: '2026-06-19', category: 'food', title: '광부도시락 세트', amount: 180, payment: 'cash', payer: 'bitna' },
 
       // Day 4 (06/20)
-      { id: 13, date: '2026-06-20', category: 'shopping', title: '까르푸 수신방 펑리수 5박스', amount: 1750, payment: 'card' },
-      { id: 14, date: '2026-06-20', category: 'shopping', title: '융캉제 한풍 세인트피터 누가크래커', amount: 840, payment: 'cash' },
-      { id: 15, date: '2026-06-20', category: 'food', title: '키키레스토랑 고기 파볶음 & 연두부튀김', amount: 1150, payment: 'card' },
-      { id: 16, date: '2026-06-20', category: 'transport', title: '공항 귀국 MRT 편도', amount: 150, payment: 'cash' },
+      { id: 13, date: '2026-06-20', category: 'shopping', title: '까르푸 수신방 펑리수 5박스', amount: 1750, payment: 'card', payer: 'others' },
+      { id: 14, date: '2026-06-20', category: 'shopping', title: '융캉제 한풍 세인트피터 누가크래커', amount: 840, payment: 'cash', payer: 'others' },
+      { id: 15, date: '2026-06-20', category: 'food', title: '키키레스토랑 고기 파볶음 & 연두부튀김', amount: 1150, payment: 'card', payer: 'jisu' },
+      { id: 16, date: '2026-06-20', category: 'transport', title: '공항 귀국 MRT 편도', amount: 150, payment: 'cash', payer: 'bitna' },
     ];
 
     // State Data Setup (Loading from LocalStorage if available)
@@ -439,6 +489,13 @@
       shopping: { label: '쇼핑', icon: 'fa-bag-shopping', color: 'bg-pink-100 text-pink-600', border: 'border-pink-200', gradient: 'from-pink-400 to-rose-500' },
       sightseeing: { label: '관광/체험', icon: 'fa-ticket', color: 'bg-teal-100 text-teal-600', border: 'border-teal-200', gradient: 'from-teal-400 to-emerald-500' },
       others: { label: '기타', icon: 'fa-ellipsis', color: 'bg-slate-100 text-slate-600', border: 'border-slate-200', gradient: 'from-slate-400 to-zinc-500' }
+    };
+
+    // [UPDATED] Payers metadata configuration with customized emojis
+    const payers = {
+      jisu: { name: '지수 👩🏻‍🦰', color: 'text-indigo-600 bg-indigo-50 border border-indigo-100' },
+      bitna: { name: '빛나 👱🏻‍♀️', color: 'text-rose-600 bg-rose-50 border border-rose-100' },
+      others: { name: '그 외 👥', color: 'text-slate-600 bg-slate-100 border border-slate-200' }
     };
 
     // Format tools
@@ -551,6 +608,7 @@
       const rawAmount = parseFloat(document.getElementById('new-item-amount').value) || 0;
       const category = document.getElementById('new-item-category').value;
       const payment = document.getElementById('new-item-payment').value;
+      const payer = document.getElementById('new-item-payer').value; // Get payer input
       const currency = document.getElementById('new-item-currency').value;
       
       if(!title) {
@@ -574,7 +632,8 @@
         category,
         title,
         amount,
-        payment
+        payment,
+        payer // Save payer value
       };
 
       state.expenses.push(item);
@@ -586,6 +645,7 @@
       document.getElementById('new-item-title').value = '';
       document.getElementById('new-item-amount').value = '';
       document.getElementById('new-item-currency').value = 'twd';
+      document.getElementById('new-item-payer').value = 'jisu'; // Default back to jisu
       document.getElementById('new-amount-symbol').textContent = 'NT$';
       document.getElementById('live-convert-preview').classList.add('hidden');
       
@@ -602,6 +662,7 @@
       document.getElementById('edit-item-date').value = item.date;
       document.getElementById('edit-item-category').value = item.category;
       document.getElementById('edit-item-payment').value = item.payment;
+      document.getElementById('edit-item-payer').value = item.payer || 'others'; // Setup editor payer
       document.getElementById('edit-item-title').value = item.title;
       
       // Default edit form to TWD mode for simplicity
@@ -633,6 +694,7 @@
       const date = document.getElementById('edit-item-date').value;
       const category = document.getElementById('edit-item-category').value;
       const payment = document.getElementById('edit-item-payment').value;
+      const payer = document.getElementById('edit-item-payer').value; // Save editor payer
       const title = document.getElementById('edit-item-title').value.trim();
       const currency = document.getElementById('edit-item-currency').value;
       const rawAmount = parseFloat(document.getElementById('edit-item-amount').value) || 0;
@@ -650,7 +712,7 @@
 
       state.expenses = state.expenses.map(item => {
         if(item.id === id) {
-          return { ...item, date, category, payment, title, amount };
+          return { ...item, date, category, payment, payer, title, amount };
         }
         return item;
       });
@@ -788,11 +850,15 @@
       } else {
         activeDayExpenses.forEach(item => {
           const cat = categories[item.category] || categories.others;
+          // Get Payer configuration (Fallbacks to 'others' if not present for older saved datasets)
+          const itemPayer = item.payer || 'others';
+          const payerMeta = payers[itemPayer] || payers.others;
+
           const row = document.createElement('div');
           row.className = "py-3 flex items-center justify-between hover:bg-slate-50/70 rounded-lg px-2 transition group duration-150";
           row.innerHTML = `
             <div class="flex items-center gap-3">
-              <!-- Category badge style circle (Tells the category visually) -->
+              <!-- Category badge style circle -->
               <div class="w-9 h-9 ${cat.color} rounded-xl flex items-center justify-center text-xs font-bold shrink-0 shadow-sm" title="${cat.label}">
                 <i class="fa-solid ${cat.icon}"></i>
               </div>
@@ -802,6 +868,12 @@
                   <!-- Cash/Card Payment Method displayed ONLY as clean Icon -->
                   <span class="text-xs select-none" title="${item.payment === 'cash' ? '현금 지출' : '카드 지출'}">
                     ${item.payment === 'cash' ? '💵' : '💳'}
+                  </span>
+                  
+                  <!-- Payer Identifier pill next to payment method icon -->
+                  <span class="inline-block w-1 h-1 bg-slate-200 rounded-full"></span>
+                  <span class="text-[9px] px-1.5 py-0.5 rounded-md font-extrabold tracking-tight ${payerMeta.color}">
+                    ${payerMeta.name}
                   </span>
                 </div>
               </div>
@@ -835,6 +907,30 @@
       // Total Spent Box (Grand total accrued)
       document.getElementById('summary-spent-twd').textContent = formatTWD(totalSpent);
       document.getElementById('summary-spent-krw').textContent = formatKRW(totalSpent);
+
+      // Calculate Payer Statistics
+      let jisuTotal = 0;
+      let bitnaTotal = 0;
+      let othersTotal = 0;
+
+      state.expenses.forEach(item => {
+        const itemPayer = item.payer || 'others';
+        if (itemPayer === 'jisu') {
+          jisuTotal += item.amount;
+        } else if (itemPayer === 'bitna') {
+          bitnaTotal += item.amount;
+        } else {
+          othersTotal += item.amount;
+        }
+      });
+
+      // Update Payer Summaries in UI
+      document.getElementById('payer-jisu-sum').textContent = formatTWD(jisuTotal);
+      document.getElementById('payer-jisu-sum-krw').textContent = formatKRW(jisuTotal);
+      document.getElementById('payer-bitna-sum').textContent = formatTWD(bitnaTotal);
+      document.getElementById('payer-bitna-sum-krw').textContent = formatKRW(bitnaTotal);
+      document.getElementById('payer-others-sum').textContent = formatTWD(othersTotal);
+      document.getElementById('payer-others-sum-krw').textContent = formatKRW(othersTotal);
 
       // Category Chart Statistics
       const catTotals = { food: 0, transport: 0, hotel: 0, shopping: 0, sightseeing: 0, others: 0 };
@@ -916,6 +1012,46 @@
           cardDiv.style.width = `${cardPercent}%`;
           cardDiv.textContent = `${cardPercent}%`;
           ratioBar.appendChild(cardDiv);
+        }
+      }
+
+      // [NEW] Dynamically Populate Payer Breakdown Bar Graph
+      const jisuPercent = totalSpent > 0 ? Math.round((jisuTotal / totalSpent) * 100) : 0;
+      const bitnaPercent = totalSpent > 0 ? Math.round((bitnaTotal / totalSpent) * 100) : 0;
+      const othersPercent = totalSpent > 0 ? Math.round((othersTotal / totalSpent) * 100) : 0;
+
+      // Update values in Payer Ratio Section
+      document.getElementById('payer-jisu-ratio-val').textContent = formatTWD(jisuTotal);
+      document.getElementById('payer-bitna-ratio-val').textContent = formatTWD(bitnaTotal);
+      document.getElementById('payer-others-ratio-val').textContent = formatTWD(othersTotal);
+
+      const payerRatioBar = document.getElementById('payer-ratio-bar');
+      payerRatioBar.innerHTML = '';
+
+      if (totalSpent === 0) {
+        payerRatioBar.innerHTML = `<div class="bg-slate-200 w-full flex items-center justify-center text-slate-400 text-[9px] font-bold">기록 없음</div>`;
+      } else {
+        // Render 3 distinct color divs for Jisu, Bitna, and Others
+        if (jisuPercent > 0) {
+          const jisuDiv = document.createElement('div');
+          jisuDiv.className = "bg-indigo-500 flex items-center justify-center transition-all duration-500 ease-out";
+          jisuDiv.style.width = `${jisuPercent}%`;
+          jisuDiv.textContent = `${jisuPercent}%`;
+          payerRatioBar.appendChild(jisuDiv);
+        }
+        if (bitnaPercent > 0) {
+          const bitnaDiv = document.createElement('div');
+          bitnaDiv.className = "bg-rose-500 flex items-center justify-center transition-all duration-500 ease-out";
+          bitnaDiv.style.width = `${bitnaPercent}%`;
+          bitnaDiv.textContent = `${bitnaPercent}%`;
+          payerRatioBar.appendChild(bitnaDiv);
+        }
+        if (othersPercent > 0) {
+          const othersDiv = document.createElement('div');
+          othersDiv.className = "bg-slate-400 flex items-center justify-center transition-all duration-500 ease-out";
+          othersDiv.style.width = `${othersPercent}%`;
+          othersDiv.textContent = `${othersPercent}%`;
+          payerRatioBar.appendChild(othersDiv);
         }
       }
     }
