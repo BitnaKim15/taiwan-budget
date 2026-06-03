@@ -82,7 +82,7 @@
            ========================================== -->
       <section class="lg:col-span-7 xl:col-span-8 space-y-6">
 
-        <!-- [Moved Here!] Mini Currency Exchange Calculator (Optimized Horizontal Layout) -->
+        <!-- Mini Currency Exchange Calculator (Optimized Horizontal Layout) -->
         <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm">
           <div class="flex items-center justify-between mb-3 px-1">
             <h3 class="text-xs font-black text-slate-700 flex items-center gap-1.5">
@@ -159,12 +159,18 @@
                 <input type="text" id="new-item-title" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-teal-500 font-medium" placeholder="예: 삼형매 망고빙수, 스린야시장 지파이">
               </div>
 
-              <!-- Amount input -->
+              <!-- Amount input with currency select -->
               <div class="sm:col-span-8">
-                <label class="block text-xs font-bold text-slate-500 mb-1">사용 금액 (대만 달러 TWD)</label>
-                <div class="relative">
-                  <span class="absolute left-3 top-2.5 text-slate-400 text-xs font-black">NT$</span>
-                  <input type="number" id="new-item-amount" class="w-full bg-slate-50 border border-slate-200 rounded-xl py-2 pl-12 pr-3 text-right font-black text-sm focus:outline-none focus:ring-2 focus:ring-teal-500" placeholder="0" oninput="showLiveConvert(this.value)">
+                <label class="block text-xs font-bold text-slate-500 mb-1">사용 금액</label>
+                <div class="flex gap-2">
+                  <select id="new-item-currency" class="bg-slate-50 border border-slate-200 rounded-xl px-2 py-2 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-teal-500" onchange="toggleInputCurrency('new')">
+                    <option value="twd">🇹🇼 TWD (NT$)</option>
+                    <option value="krw">🇰🇷 KRW (₩)</option>
+                  </select>
+                  <div class="relative flex-1">
+                    <span id="new-amount-symbol" class="absolute left-3 top-2.5 text-slate-400 text-xs font-black">NT$</span>
+                    <input type="number" id="new-item-amount" class="w-full bg-slate-50 border border-slate-200 rounded-xl py-2 pl-12 pr-3 text-right font-black text-sm focus:outline-none focus:ring-2 focus:ring-teal-500" placeholder="0" oninput="showLiveConvert(this.value, 'new')">
+                  </div>
                 </div>
               </div>
 
@@ -177,7 +183,7 @@
             </form>
             <!-- Real-time currency conversion helper -->
             <div id="live-convert-preview" class="text-[11px] text-teal-600 font-bold mt-2 hidden">
-              <i class="fa-solid fa-calculator mr-0.5"></i> 우리 돈으로 <span id="live-convert-krw">0원</span> 정도예~
+              <!-- Dynamically populated -->
             </div>
           </div>
         </div>
@@ -327,16 +333,23 @@
         </div>
 
         <div>
-          <label class="block text-xs font-bold text-slate-500 mb-1">사용 금액 (대만 달러 TWD)</label>
-          <div class="relative">
-            <span class="absolute left-3 top-2.5 text-slate-400 font-bold text-xs">NT$</span>
-            <input type="number" id="edit-item-amount" class="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-12 pr-3 text-right font-black text-xs focus:outline-none focus:ring-2 focus:ring-teal-500" placeholder="0">
+          <label class="block text-xs font-bold text-slate-500 mb-1">사용 금액</label>
+          <div class="flex gap-2">
+            <select id="edit-item-currency" class="bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-teal-500" onchange="toggleInputCurrency('edit')">
+              <option value="twd">🇹🇼 TWD (NT$)</option>
+              <option value="krw">🇰🇷 KRW (₩)</option>
+            </select>
+            <div class="relative flex-1">
+              <span id="edit-amount-symbol" class="absolute left-3 top-2.5 text-slate-400 font-bold text-xs">NT$</span>
+              <input type="number" id="edit-item-amount" class="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-12 pr-3 text-right font-black text-xs focus:outline-none focus:ring-2 focus:ring-teal-500" placeholder="0">
+            </div>
           </div>
         </div>
       </div>
       <div class="bg-slate-50 px-5 py-3.5 flex gap-2 justify-end border-t border-slate-100">
-        <button onclick="closeEditModal()" class="px-3.5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-600 rounded-xl font-bold text-xs transition duration-200">취소</button>
-        <button onclick="saveItemEdit()" class="px-4.5 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-bold text-xs transition duration-200">저장</button>
+        <!-- Both button widths unified to w-20 for perfect size parity -->
+        <button onclick="closeEditModal()" class="w-20 py-2 bg-slate-200 hover:bg-slate-300 text-slate-600 rounded-xl font-bold text-xs transition duration-200">취소</button>
+        <button onclick="saveItemEdit()" class="w-20 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-bold text-xs transition duration-200">저장</button>
       </div>
     </div>
   </div>
@@ -453,15 +466,39 @@
       }, 2500);
     }
 
+    // Toggle Input Currency Interface
+    function toggleInputCurrency(mode) {
+      const currencySelect = document.getElementById(`${mode}-item-currency`);
+      const symbolSpan = document.getElementById(`${mode}-amount-symbol`);
+      const amountInput = document.getElementById(`${mode}-item-amount`);
+      
+      if (currencySelect.value === 'krw') {
+        symbolSpan.textContent = '₩';
+        amountInput.placeholder = '0';
+      } else {
+        symbolSpan.textContent = 'NT$';
+        amountInput.placeholder = '0';
+      }
+      
+      if (mode === 'new') {
+        showLiveConvert(amountInput.value, 'new');
+      }
+    }
+
     // Mini Live conversion as you type
-    function showLiveConvert(val) {
+    function showLiveConvert(val, mode = 'new') {
       const liveBox = document.getElementById('live-convert-preview');
-      const liveText = document.getElementById('live-convert-krw');
+      const currency = document.getElementById('new-item-currency').value;
       const num = parseFloat(val) || 0;
       
-      if(num > 0) {
+      if (num > 0) {
         liveBox.classList.remove('hidden');
-        liveText.textContent = formatKRW(num);
+        if (currency === 'twd') {
+          liveBox.innerHTML = `<i class="fa-solid fa-calculator mr-0.5"></i> 우리 돈으로 <span class="font-extrabold">${formatKRW(num)}</span> 정도예~`;
+        } else {
+          const twdVal = num / state.exchangeRate;
+          liveBox.innerHTML = `<i class="fa-solid fa-calculator mr-0.5"></i> 대만 달러로 <span class="font-extrabold">${formatTWD(twdVal)}</span> 정도예~`;
+        }
       } else {
         liveBox.classList.add('hidden');
       }
@@ -493,6 +530,7 @@
       document.getElementById('calc-krw').value = Math.round(num * state.exchangeRate);
     }
 
+    // Convert KRW to TWD based on current exchange rate
     function convertKrwToTwd(val) {
       const num = parseFloat(val) || 0;
       document.getElementById('calc-twd').value = Math.round((num / state.exchangeRate) * 100) / 100;
@@ -503,17 +541,24 @@
       event.preventDefault();
       
       const title = document.getElementById('new-item-title').value.trim();
-      const amount = parseFloat(document.getElementById('new-item-amount').value) || 0;
+      const rawAmount = parseFloat(document.getElementById('new-item-amount').value) || 0;
       const category = document.getElementById('new-item-category').value;
       const payment = document.getElementById('new-item-payment').value;
+      const currency = document.getElementById('new-item-currency').value;
       
       if(!title) {
         showToast('어디에 돈을 쓰셨는지 상세 메모를 입력하세예! ✏️', 'error');
         return;
       }
-      if(amount <= 0) {
-        showToast('사용 금액은 최소 1대만 달러 이상이어야 해예! 💰', 'error');
+      if(rawAmount <= 0) {
+        showToast('사용 금액은 최소 1원 또는 1대만 달러 이상이어야 해예! 💰', 'error');
         return;
+      }
+
+      // Normalize amount to TWD
+      let amount = rawAmount;
+      if (currency === 'krw') {
+        amount = rawAmount / state.exchangeRate;
       }
 
       const item = {
@@ -533,6 +578,8 @@
       // Clean form fields
       document.getElementById('new-item-title').value = '';
       document.getElementById('new-item-amount').value = '';
+      document.getElementById('new-item-currency').value = 'twd';
+      document.getElementById('new-amount-symbol').textContent = 'NT$';
       document.getElementById('live-convert-preview').classList.add('hidden');
       
       renderAll();
@@ -549,7 +596,11 @@
       document.getElementById('edit-item-category').value = item.category;
       document.getElementById('edit-item-payment').value = item.payment;
       document.getElementById('edit-item-title').value = item.title;
-      document.getElementById('edit-item-amount').value = item.amount;
+      
+      // Default edit form to TWD mode for simplicity
+      document.getElementById('edit-item-currency').value = 'twd';
+      document.getElementById('edit-amount-symbol').textContent = 'NT$';
+      document.getElementById('edit-item-amount').value = Math.round(item.amount);
 
       const modal = document.getElementById('edit-modal');
       modal.classList.remove('hidden');
@@ -576,11 +627,18 @@
       const category = document.getElementById('edit-item-category').value;
       const payment = document.getElementById('edit-item-payment').value;
       const title = document.getElementById('edit-item-title').value.trim();
-      const amount = parseFloat(document.getElementById('edit-item-amount').value) || 0;
+      const currency = document.getElementById('edit-item-currency').value;
+      const rawAmount = parseFloat(document.getElementById('edit-item-amount').value) || 0;
 
-      if(!title || amount <= 0) {
+      if(!title || rawAmount <= 0) {
         showToast('올바른 지출 상세 내역과 금액을 기입하세예!', 'error');
         return;
+      }
+
+      // Normalize amount to TWD
+      let amount = rawAmount;
+      if (currency === 'krw') {
+        amount = rawAmount / state.exchangeRate;
       }
 
       state.expenses = state.expenses.map(item => {
