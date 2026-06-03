@@ -365,8 +365,9 @@
         <p class="text-xs font-bold text-slate-600 leading-relaxed" id="confirm-modal-message">정말 진행하시겠어예?</p>
       </div>
       <div class="bg-slate-50 px-4 py-3 flex gap-2 justify-end border-t border-slate-100">
-        <button onclick="closeConfirmModal()" class="px-3.5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-600 rounded-xl font-bold text-xs transition duration-200">돌아가기</button>
-        <button id="confirm-modal-btn" class="px-4.5 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold text-xs transition duration-200">확인</button>
+        <!-- Unified both buttons to w-20 to ensure perfect size symmetry for confirm modal -->
+        <button onclick="closeConfirmModal()" class="w-20 py-2 bg-slate-200 hover:bg-slate-300 text-slate-600 rounded-xl font-bold text-xs transition duration-200">돌아가기</button>
+        <button id="confirm-modal-btn" class="w-20 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold text-xs transition duration-200">확인</button>
       </div>
     </div>
   </div>
