@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>대만 여행 가계부 🇹🇼</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts - Pretendard -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
+  <style>
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+    }
+    /* Scrollbar Customization */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 pb-16">
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- Top Hero Header Banner -->
+  <header class="bg-gradient-to-r from-teal-700 via-emerald-700 to-teal-800 text-white shadow-md relative overflow-hidden">
+    <!-- Taiwan Lantern / Sky Deco Lines -->
+    <div class="absolute inset-0 opacity-10 pointer-events-none">
+      <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 0 80 Q 200 40 400 80 T 800 80 T 1200 80" fill="none" stroke="white" stroke-width="2"/>
+        <path d="M 0 130 Q 250 100 500 150 T 1000 110" fill="none" stroke="white" stroke-width="1"/>
+      </svg>
+    </div>
+    
+    <div class="max-w-7xl mx-auto px-4 py-5 md:py-6 flex flex-col sm:flex-row justify-between items-center relative z-10 gap-3">
+      <div class="text-center sm:text-left">
+        <span class="inline-flex items-center gap-1.5 bg-teal-600/50 text-emerald-100 text-xs font-bold px-2.5 py-1 rounded-full border border-teal-500/30">
+          <i class="fa-solid fa-plane"></i> 3박 4일 대만 타이베이 힐링 투어
+        </span>
+        <h1 class="text-xl md:text-3xl font-extrabold tracking-tight mt-1">대만 여행 가계부 🇹🇼</h1>
+        <p class="text-teal-200 text-xs mt-0.5">
+          <i class="fa-regular fa-calendar"></i> 2026년 06월 17일(수) ~ 2026년 06월 20일(토)
+        </p>
+      </div>
+
+      <!-- Quick Exchange Rate Tool -->
+      <div class="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20 flex items-center gap-3">
+        <div class="text-xs">
+          <p class="text-teal-100/80 font-bold">대만 환율 (1 TWD)</p>
+          <div class="flex items-center gap-1 mt-0.5">
+            <span class="text-emerald-300 font-extrabold text-sm">₩</span>
+            <input type="number" id="exchange-rate-input" step="0.01" class="bg-transparent text-white font-black text-sm w-16 focus:outline-none border-b border-white/30 text-center" value="48.32" onchange="updateExchangeRate()">
+          </div>
+        </div>
+        <button onclick="updateExchangeRate()" class="bg-emerald-500 hover:bg-emerald-400 text-white font-bold text-xs px-2.5 py-1.5 rounded-lg transition duration-200">
+          환율적용
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-4 mt-6">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      
+      <!-- ==========================================
+           LEFT COLUMN: Daily Ledger Tab & Work Area (7/12)
+           ========================================== -->
+      <section class="lg:col-span-7 xl:col-span-8 space-y-6">
+
+        <!-- [Moved Here!] Mini Currency Exchange Calculator (Optimized Horizontal Layout) -->
+        <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm">
+          <div class="flex items-center justify-between mb-3 px-1">
+            <h3 class="text-xs font-black text-slate-700 flex items-center gap-1.5">
+              <i class="fa-solid fa-calculator text-teal-600"></i>
+              <span>현장 간편 계산기</span>
+            </h3>
+            <span class="text-[10px] font-bold text-slate-400">TWD ↔ KRW 바로 환산</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-5 gap-2 items-center">
+            <!-- TWD Input -->
+            <div class="sm:col-span-2 relative">
+              <span class="absolute left-3 top-2 text-[10px] font-black text-slate-400">TWD</span>
+              <input type="number" id="calc-twd" class="w-full bg-slate-50 border border-slate-200 rounded-xl py-1.5 pl-12 pr-3 text-right font-black text-xs focus:outline-none focus:ring-2 focus:ring-teal-500" value="100" oninput="convertTwdToKrw(this.value)">
+            </div>
+            <!-- Arrow Divider -->
+            <div class="flex justify-center text-slate-300 sm:col-span-1">
+              <i class="fa-solid fa-arrows-left-right hidden sm:block text-xs"></i>
+              <i class="fa-solid fa-arrows-up-down sm:hidden text-[10px] py-0.5"></i>
+            </div>
+            <!-- KRW Input -->
+            <div class="sm:col-span-2 relative">
+              <span class="absolute left-3 top-2 text-[10px] font-black text-slate-400">KRW</span>
+              <input type="number" id="calc-krw" class="w-full bg-slate-50 border border-slate-200 rounded-xl py-1.5 pl-12 pr-3 text-right font-black text-xs focus:outline-none focus:ring-2 focus:ring-teal-500" value="4832" oninput="convertKrwToTwd(this.value)">
+            </div>
+          </div>
+        </div>
+        
+        <!-- Date Switcher Navigation Tab -->
+        <div class="bg-white rounded-2xl p-3 border border-slate-200 shadow-sm">
+          <div class="flex items-center justify-between px-2 mb-2">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider"><i class="fa-solid fa-route mr-1"></i> 날짜 선택</span>
+            <span class="text-[10px] text-teal-600 bg-teal-50 px-2 py-0.5 rounded-md font-extrabold">터치해서 날짜별로 보세예~</span>
+          </div>
+          <div class="grid grid-cols-4 gap-2" id="date-tabs-grid">
+            <!-- Rendered by JavaScript dynamically -->
+          </div>
+        </div>
+
+        <!-- 1. 지출 등록란 (Daily Input Form Box) -->
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm relative overflow-hidden">
+          <div class="absolute right-0 top-0 w-24 h-24 -mt-4 -mr-4 bg-teal-50 rounded-full -z-0 pointer-events-none opacity-50"></div>
+          <div class="relative z-10">
+            <h2 class="text-md font-extrabold text-slate-800 mb-4 flex items-center gap-1.5">
+              <span class="w-6 h-6 bg-teal-600 text-white flex items-center justify-center rounded-lg text-xs"><i class="fa-solid fa-plus"></i></span>
+              <span id="form-title-date">지출 기록 추가</span>
+            </h2>
+            
+            <form onsubmit="addNewExpense(event)" class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
+              <!-- Category select -->
+              <div class="sm:col-span-3">
+                <label class="block text-xs font-bold text-slate-500 mb-1">지출 종류</label>
+                <select id="new-item-category" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-teal-500">
+                  <option value="food">🍔 식비</option>
+                  <option value="transport">🚇 교통</option>
+                  <option value="hotel">🏨 숙박</option>
+                  <option value="shopping">🛍️ 쇼핑</option>
+                  <option value="sightseeing">🎟️ 관광/체험</option>
+                  <option value="others">🎸 기타</option>
+                </select>
+              </div>
+              
+              <!-- Payment cash or card -->
+              <div class="sm:col-span-3">
+                <label class="block text-xs font-bold text-slate-500 mb-1">결제 방식</label>
+                <select id="new-item-payment" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-teal-500">
+                  <option value="cash">💵 현금 (Cash)</option>
+                  <option value="card">💳 카드 (Card)</option>
+                </select>
+              </div>
+
+              <!-- Title / Item name -->
+              <div class="sm:col-span-6">
+                <label class="block text-xs font-bold text-slate-500 mb-1">상세 내역 (어디에 쓰셨어예?)</label>
+                <input type="text" id="new-item-title" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-teal-500 font-medium" placeholder="예: 삼형매 망고빙수, 스린야시장 지파이">
+              </div>
+
+              <!-- Amount input -->
+              <div class="sm:col-span-8">
+                <label class="block text-xs font-bold text-slate-500 mb-1">사용 금액 (대만 달러 TWD)</label>
+                <div class="relative">
+                  <span class="absolute left-3 top-2.5 text-slate-400 text-xs font-black">NT$</span>
+                  <input type="number" id="new-item-amount" class="w-full bg-slate-50 border border-slate-200 rounded-xl py-2 pl-12 pr-3 text-right font-black text-sm focus:outline-none focus:ring-2 focus:ring-teal-500" placeholder="0" oninput="showLiveConvert(this.value)">
+                </div>
+              </div>
+
+              <!-- Submit button -->
+              <div class="sm:col-span-4">
+                <button type="submit" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-extrabold py-2.5 rounded-xl shadow-sm transition duration-200 text-xs flex items-center justify-center gap-1.5">
+                  <i class="fa-solid fa-check"></i> 이 날짜에 등록
+                </button>
+              </div>
+            </form>
+            <!-- Real-time currency conversion helper -->
+            <div id="live-convert-preview" class="text-[11px] text-teal-600 font-bold mt-2 hidden">
+              <i class="fa-solid fa-calculator mr-0.5"></i> 우리 돈으로 <span id="live-convert-krw">0원</span> 정도예~
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. 추가된 지출 리스트 & 날짜별 총합 (Expense List & Daily Total Box) -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col justify-between">
+          
+          <!-- Box Header -->
+          <div class="bg-slate-50 px-5 py-3.5 border-b border-slate-200 flex justify-between items-center">
+            <h3 class="font-extrabold text-slate-700 text-sm flex items-center gap-1.5">
+              <i class="fa-solid fa-list text-teal-600"></i>
+              <span id="list-title-date">지출 내역</span>
+            </h3>
+            <span class="text-[10px] text-slate-400 font-bold" id="item-count-text">0건의 소비 내역</span>
+          </div>
+
+          <!-- List Body -->
+          <div class="p-3 divide-y divide-slate-100 min-h-[180px]" id="daily-items-list">
+            <!-- Javascript will inject list rows dynamically -->
+          </div>
+
+          <!-- 3. 날짜별 총합 (Daily Total Area) -->
+          <div class="bg-teal-50/70 border-t border-teal-100 p-4 flex flex-col sm:flex-row justify-between items-center gap-2">
+            <div class="text-center sm:text-left">
+              <span class="text-[10px] text-teal-700 font-black tracking-wider uppercase bg-teal-100 px-2 py-0.5 rounded-md" id="total-badge-date">6/17 (수) 하루 합계</span>
+            </div>
+            <div class="text-center sm:text-right">
+              <span class="text-xl font-black text-teal-800" id="daily-total-twd">NT$ 0</span>
+              <span class="text-xs font-bold text-teal-600 block sm:inline ml-0 sm:ml-2" id="daily-total-krw">(₩0)</span>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- ==========================================
+           RIGHT COLUMN: 여행 기간 가계 총정리 (별도 란 - 5/12)
+           ========================================== -->
+      <aside class="lg:col-span-5 xl:col-span-4 space-y-6 lg:sticky lg:top-6">
+        
+        <!-- Big Summary Card -->
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm relative overflow-hidden">
+          <div class="absolute right-4 top-4 text-emerald-100 text-6xl font-black -z-0 pointer-events-none opacity-30">
+            <i class="fa-solid fa-file-invoice-dollar"></i>
+          </div>
+
+          <div class="relative z-10">
+            <h3 class="text-md font-extrabold text-slate-800 mb-4 flex items-center gap-1.5">
+              <span class="w-6 h-6 bg-emerald-600 text-white flex items-center justify-center rounded-lg text-xs"><i class="fa-solid fa-chart-pie"></i></span>
+              <span>여행 기간 가계 총정리</span>
+            </h3>
+
+            <!-- Grand Expenditure Summary Card -->
+            <div class="bg-rose-50 border border-rose-100 p-4 rounded-xl text-center mb-5 relative overflow-hidden">
+              <span class="text-[10px] text-rose-500 font-extrabold tracking-wider block uppercase">전체 누적 지출액 💸</span>
+              <span class="text-2xl font-black text-rose-700 block mt-1" id="summary-spent-twd">NT$ 0</span>
+              <span class="text-xs font-bold text-rose-500 block mt-0.5" id="summary-spent-krw">₩0</span>
+            </div>
+
+            <!-- Split Category chart stats -->
+            <div class="space-y-3 pt-1">
+              <h4 class="text-xs font-black text-slate-700 flex items-center justify-between">
+                <span><i class="fa-solid fa-list-check text-emerald-600"></i> 항목별 지출 비중</span>
+                <span class="text-[10px] text-slate-400 font-normal">비율 순 정렬</span>
+              </h4>
+              <div class="space-y-2.5" id="category-chart-container">
+                <!-- Injected dynamically -->
+              </div>
+            </div>
+
+            <!-- Payment Breakdown Stat (Card vs Cash) -->
+            <div class="space-y-2 pt-4 border-t border-slate-100 mt-4">
+              <h4 class="text-xs font-black text-slate-700"><i class="fa-solid fa-credit-card text-teal-600"></i> 결제 수단 요약</h4>
+              <div class="flex h-5 rounded-lg overflow-hidden border border-slate-100 shadow-sm text-[9px] font-black text-white" id="payment-ratio-bar">
+                <!-- Dynamically populated -->
+              </div>
+              <div class="flex justify-between text-[10px] text-slate-500 px-1 mt-1 font-semibold">
+                <span class="flex items-center gap-1"><span class="inline-block w-2.5 h-2.5 bg-amber-400 rounded-full"></span> 현금: <span id="payment-cash-total" class="font-bold">NT$ 0</span></span>
+                <span class="flex items-center gap-1"><span class="inline-block w-2.5 h-2.5 bg-blue-500 rounded-full"></span> 카드: <span id="payment-card-total" class="font-bold">NT$ 0</span></span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Emergency actions -->
+        <div class="flex gap-2">
+          <button onclick="openResetConfirm()" class="w-full bg-white hover:bg-rose-50 text-rose-600 border border-rose-200 font-extrabold text-xs py-2.5 rounded-xl transition duration-200 flex items-center justify-center gap-1 shadow-sm">
+            <i class="fa-solid fa-trash-can"></i> 전체 지출 초기화
+          </button>
+        </div>
+
+      </aside>
+
+    </div>
+  </main>
+
+  <!-- ==========================================
+       MODALS SECTION
+       ========================================== -->
+  
+  <!-- Edit Item Modal -->
+  <div id="edit-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden transform scale-95 transition-transform duration-300">
+      <div class="bg-teal-600 text-white p-4 font-bold flex justify-between items-center">
+        <span class="text-sm font-extrabold"><i class="fa-solid fa-pen-to-square mr-1"></i> 지출 항목 수정</span>
+        <button onclick="closeEditModal()" class="hover:text-teal-200"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <div class="p-5 space-y-3.5">
+        <input type="hidden" id="edit-item-id">
+        
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">지출 날짜</label>
+          <select id="edit-item-date" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-teal-500 font-semibold">
+            <option value="2026-06-17">06월 17일 (수)</option>
+            <option value="2026-06-18">06월 18일 (목)</option>
+            <option value="2026-06-19">06월 19일 (금)</option>
+            <option value="2026-06-20">06월 20일 (토)</option>
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-500 mb-1">카테고리</label>
+            <select id="edit-item-category" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-teal-500">
+              <option value="food">🍔 식비</option>
+              <option value="transport">🚇 교통</option>
+              <option value="hotel">🏨 숙박</option>
+              <option value="shopping">🛍️ 쇼핑</option>
+              <option value="sightseeing">🎟️ 관광</option>
+              <option value="others">🎸 기타</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 mb-1">결제 수단</label>
+            <select id="edit-item-payment" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-teal-500">
+              <option value="cash">💵 현금 (Cash)</option>
+              <option value="card">💳 카드 (Card)</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">상세 내용 (메모)</label>
+          <input type="text" id="edit-item-title" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-teal-500 font-semibold" placeholder="예: 아종면선 곱창국수">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">사용 금액 (대만 달러 TWD)</label>
+          <div class="relative">
+            <span class="absolute left-3 top-2.5 text-slate-400 font-bold text-xs">NT$</span>
+            <input type="number" id="edit-item-amount" class="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-12 pr-3 text-right font-black text-xs focus:outline-none focus:ring-2 focus:ring-teal-500" placeholder="0">
+          </div>
+        </div>
+      </div>
+      <div class="bg-slate-50 px-5 py-3.5 flex gap-2 justify-end border-t border-slate-100">
+        <button onclick="closeEditModal()" class="px-3.5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-600 rounded-xl font-bold text-xs transition duration-200">취소</button>
+        <button onclick="saveItemEdit()" class="px-4.5 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-bold text-xs transition duration-200">저장</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom Delete/Reset Confirm Modal (No alert() or confirm() blockages!) -->
+  <div id="confirm-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full shadow-2xl border border-slate-200 overflow-hidden transform scale-95 transition-transform duration-300">
+      <div class="bg-rose-600 text-white p-4 font-bold flex items-center gap-2">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span class="text-sm font-extrabold" id="confirm-modal-title">경고</span>
+      </div>
+      <div class="p-5">
+        <p class="text-xs font-bold text-slate-600 leading-relaxed" id="confirm-modal-message">정말 진행하시겠어예?</p>
+      </div>
+      <div class="bg-slate-50 px-4 py-3 flex gap-2 justify-end border-t border-slate-100">
+        <button onclick="closeConfirmModal()" class="px-3.5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-600 rounded-xl font-bold text-xs transition duration-200">돌아가기</button>
+        <button id="confirm-modal-btn" class="px-4.5 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold text-xs transition duration-200">확인</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ==========================================
+       JAVASCRIPT CORE LOGIC
+       ========================================== -->
+  <script>
+    // Helper to save current state to localStorage
+    function saveToLocalStorage() {
+      localStorage.setItem('taiwan_ledger_exchange_rate', state.exchangeRate);
+      localStorage.setItem('taiwan_ledger_expenses', JSON.stringify(state.expenses));
+    }
+
+    // Default Fallback Mock Expenses (Used only on very first load)
+    const defaultExpenses = [
+      // Day 1 (06/17)
+      { id: 1, date: '2026-06-17', category: 'hotel', title: '시먼 시티 리조트 호텔 (3박 예약분)', amount: 6800, payment: 'card' },
+      { id: 2, date: '2026-06-17', category: 'transport', title: '타오위안 공항 익스프레스 MRT', amount: 150, payment: 'cash' },
+      { id: 3, date: '2026-06-17', category: 'food', title: '아종면선 곱창국수 (큰그릇)', amount: 75, payment: 'cash' },
+      { id: 4, date: '2026-06-17', category: 'food', title: '시먼 삼형매 망고빙수', amount: 250, payment: 'cash' },
+      
+      // Day 2 (06/18)
+      { id: 5, date: '2026-06-18', category: 'food', title: '딘타이펑 본점 샤오롱바오 & 우육면', amount: 980, payment: 'card' },
+      { id: 6, date: '2026-06-18', category: 'sightseeing', title: '타이베이 101 전망대 티켓 2매', amount: 1200, payment: 'card' },
+      { id: 7, date: '2026-06-18', category: 'food', title: '춘수당 밀크티 2잔', amount: 380, payment: 'cash' },
+      { id: 8, date: '2026-06-18', category: 'food', title: '스린야시장 지파이 & 편의점 맥주', amount: 230, payment: 'cash' },
+      
+      // Day 3 (06/19)
+      { id: 9, date: '2026-06-19', category: 'transport', title: '예스진지 1일 버스투어 동행 비용', amount: 1600, payment: 'card' },
+      { id: 10, date: '2026-06-19', category: 'food', title: '지우펀 아메이차주관 차 체험세트', amount: 300, payment: 'cash' },
+      { id: 11, date: '2026-06-19', category: 'sightseeing', title: '스펀 천등 날리기 4색 세트', amount: 250, payment: 'cash' },
+      { id: 12, date: '2026-06-19', category: 'food', title: '광부도시락 세트', amount: 180, payment: 'cash' },
+
+      // Day 4 (06/20)
+      { id: 13, date: '2026-06-20', category: 'shopping', title: '까르푸 수신방 펑리수 5박스', amount: 1750, payment: 'card' },
+      { id: 14, date: '2026-06-20', category: 'shopping', title: '융캉제 한풍 세인트피터 누가크래커', amount: 840, payment: 'cash' },
+      { id: 15, date: '2026-06-20', category: 'food', title: '키키레스토랑 고기 파볶음 & 연두부튀김', amount: 1150, payment: 'card' },
+      { id: 16, date: '2026-06-20', category: 'transport', title: '공항 귀국 MRT 편도', amount: 150, payment: 'cash' },
+    ];
+
+    // State Data Setup (Loading from LocalStorage if available)
+    const state = {
+      exchangeRate: parseFloat(localStorage.getItem('taiwan_ledger_exchange_rate')) || 48.32,
+      activeTab: '2026-06-17', // '2026-06-17' | '2026-06-18' | '2026-06-19' | '2026-06-20'
+      expenses: JSON.parse(localStorage.getItem('taiwan_ledger_expenses')) || defaultExpenses
+    };
+
+    // Constant Day details
+    const travelDates = [
+      { date: '2026-06-17', label: '6/17 (수)', day: '1일차' },
+      { date: '2026-06-18', label: '6/18 (목)', day: '2일차' },
+      { date: '2026-06-19', label: '6/19 (금)', day: '3일차' },
+      { date: '2026-06-20', label: '6/20 (토)', day: '4일차' }
+    ];
+
+    // Category Visual metadata
+    const categories = {
+      food: { label: '식비', icon: 'fa-utensils', color: 'bg-orange-100 text-orange-600', border: 'border-orange-200', gradient: 'from-orange-400 to-amber-500' },
+      transport: { label: '교통', icon: 'fa-train-subway', color: 'bg-blue-100 text-blue-600', border: 'border-blue-200', gradient: 'from-blue-400 to-sky-500' },
+      hotel: { label: '숙박', icon: 'fa-hotel', color: 'bg-indigo-100 text-indigo-600', border: 'border-indigo-200', gradient: 'from-indigo-400 to-purple-500' },
+      shopping: { label: '쇼핑', icon: 'fa-bag-shopping', color: 'bg-pink-100 text-pink-600', border: 'border-pink-200', gradient: 'from-pink-400 to-rose-500' },
+      sightseeing: { label: '관광/체험', icon: 'fa-ticket', color: 'bg-teal-100 text-teal-600', border: 'border-teal-200', gradient: 'from-teal-400 to-emerald-500' },
+      others: { label: '기타', icon: 'fa-ellipsis', color: 'bg-slate-100 text-slate-600', border: 'border-slate-200', gradient: 'from-slate-400 to-zinc-500' }
+    };
+
+    // Format tools
+    function formatTWD(val) {
+      return `NT$ ${Math.round(val).toLocaleString('ko-KR')}`;
+    }
+
+    // Convert TWD to KRW using current exchangeRate
+    function formatKRW(twdVal) {
+      const krw = Math.round(twdVal * state.exchangeRate);
+      return `₩${krw.toLocaleString('ko-KR')}`;
+    }
+
+    // Custom Toast
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      
+      const icon = type === 'success' 
+        ? '<i class="fa-solid fa-circle-check text-emerald-500 mr-2"></i>' 
+        : '<i class="fa-solid fa-triangle-exclamation text-rose-500 mr-2"></i>';
+        
+      toast.className = "flex items-center bg-white border border-slate-100 p-3.5 rounded-xl shadow-xl transform translate-y-2 transition-all duration-300 pointer-events-auto border-l-4 " + (type === 'success' ? 'border-l-emerald-500' : 'border-l-rose-500');
+      toast.innerHTML = `${icon} <span class="text-xs font-bold text-slate-700">${message}</span>`;
+      
+      container.appendChild(toast);
+      
+      // Animations
+      setTimeout(() => {
+        toast.classList.add('opacity-0', '-translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 2500);
+    }
+
+    // Mini Live conversion as you type
+    function showLiveConvert(val) {
+      const liveBox = document.getElementById('live-convert-preview');
+      const liveText = document.getElementById('live-convert-krw');
+      const num = parseFloat(val) || 0;
+      
+      if(num > 0) {
+        liveBox.classList.remove('hidden');
+        liveText.textContent = formatKRW(num);
+      } else {
+        liveBox.classList.add('hidden');
+      }
+    }
+
+    // Exchange Rate change
+    function updateExchangeRate() {
+      const val = parseFloat(document.getElementById('exchange-rate-input').value) || 0;
+      if(val <= 0) {
+        showToast('유효한 환율을 넣어주세예!', 'error');
+        return;
+      }
+      state.exchangeRate = val;
+      
+      // Save Exchange Rate changes
+      saveToLocalStorage();
+      
+      // Sync Footer & Calcs
+      document.querySelectorAll('.footer-rate').forEach(el => el.textContent = val.toFixed(2));
+      convertTwdToKrw(document.getElementById('calc-twd').value);
+      
+      renderAll();
+      showToast('대만 달러 환율 정보가 변경되었어예! 🔄');
+    }
+
+    // Quick conversion tools
+    function convertTwdToKrw(val) {
+      const num = parseFloat(val) || 0;
+      document.getElementById('calc-krw').value = Math.round(num * state.exchangeRate);
+    }
+
+    function convertKrwToTwd(val) {
+      const num = parseFloat(val) || 0;
+      document.getElementById('calc-twd').value = Math.round((num / state.exchangeRate) * 100) / 100;
+    }
+
+    // Add New Expense
+    function addNewExpense(event) {
+      event.preventDefault();
+      
+      const title = document.getElementById('new-item-title').value.trim();
+      const amount = parseFloat(document.getElementById('new-item-amount').value) || 0;
+      const category = document.getElementById('new-item-category').value;
+      const payment = document.getElementById('new-item-payment').value;
+      
+      if(!title) {
+        showToast('어디에 돈을 쓰셨는지 상세 메모를 입력하세예! ✏️', 'error');
+        return;
+      }
+      if(amount <= 0) {
+        showToast('사용 금액은 최소 1대만 달러 이상이어야 해예! 💰', 'error');
+        return;
+      }
+
+      const item = {
+        id: Date.now(),
+        date: state.activeTab,
+        category,
+        title,
+        amount,
+        payment
+      };
+
+      state.expenses.push(item);
+      
+      // Save changes to LocalStorage
+      saveToLocalStorage();
+      
+      // Clean form fields
+      document.getElementById('new-item-title').value = '';
+      document.getElementById('new-item-amount').value = '';
+      document.getElementById('live-convert-preview').classList.add('hidden');
+      
+      renderAll();
+      showToast('새 지출 내역이 성공적으로 기록되었어예! ✨');
+    }
+
+    // Edit Item triggers
+    function openEditModal(id) {
+      const item = state.expenses.find(x => x.id === id);
+      if(!item) return;
+
+      document.getElementById('edit-item-id').value = item.id;
+      document.getElementById('edit-item-date').value = item.date;
+      document.getElementById('edit-item-category').value = item.category;
+      document.getElementById('edit-item-payment').value = item.payment;
+      document.getElementById('edit-item-title').value = item.title;
+      document.getElementById('edit-item-amount').value = item.amount;
+
+      const modal = document.getElementById('edit-modal');
+      modal.classList.remove('hidden');
+      setTimeout(() => {
+        modal.querySelector('div').classList.remove('scale-95');
+        modal.querySelector('div').classList.add('scale-100');
+      }, 50);
+    }
+
+    // Close Modal helper
+    function closeEditModal() {
+      const modal = document.getElementById('edit-modal');
+      modal.querySelector('div').classList.add('scale-95');
+      modal.querySelector('div').classList.remove('scale-100');
+      setTimeout(() => {
+        modal.classList.add('hidden');
+      }, 200);
+    }
+
+    // Save Modified Item
+    function saveItemEdit() {
+      const id = parseInt(document.getElementById('edit-item-id').value);
+      const date = document.getElementById('edit-item-date').value;
+      const category = document.getElementById('edit-item-category').value;
+      const payment = document.getElementById('edit-item-payment').value;
+      const title = document.getElementById('edit-item-title').value.trim();
+      const amount = parseFloat(document.getElementById('edit-item-amount').value) || 0;
+
+      if(!title || amount <= 0) {
+        showToast('올바른 지출 상세 내역과 금액을 기입하세예!', 'error');
+        return;
+      }
+
+      state.expenses = state.expenses.map(item => {
+        if(item.id === id) {
+          return { ...item, date, category, payment, title, amount };
+        }
+        return item;
+      });
+
+      // Save changes to LocalStorage
+      saveToLocalStorage();
+
+      closeEditModal();
+      renderAll();
+      showToast('해당 지출 항목이 알맞게 수정되었어예! ✏️');
+    }
+
+    // Custom confirm triggers (Avoids iframe alerts!)
+    let confirmCallback = null;
+
+    function openConfirmModal(title, message, callback) {
+      document.getElementById('confirm-modal-title').innerText = title;
+      document.getElementById('confirm-modal-message').innerText = message;
+      confirmCallback = callback;
+
+      const modal = document.getElementById('confirm-modal');
+      modal.classList.remove('hidden');
+      setTimeout(() => {
+        modal.querySelector('div').classList.remove('scale-95');
+        modal.querySelector('div').classList.add('scale-100');
+      }, 50);
+    }
+
+    function closeConfirmModal() {
+      const modal = document.getElementById('confirm-modal');
+      modal.querySelector('div').classList.add('scale-95');
+      modal.querySelector('div').classList.remove('scale-100');
+      setTimeout(() => {
+        modal.classList.add('hidden');
+      }, 200);
+    }
+
+    document.getElementById('confirm-modal-btn').onclick = function() {
+      if(confirmCallback) {
+        confirmCallback();
+      }
+      closeConfirmModal();
+    }
+
+    // Trigger delete single item
+    function deleteItem(id) {
+      openConfirmModal('지출 항목 삭제', '선택한 소비 내역을 가계부에서 정말로 지우시겠어예? 🗑️', () => {
+        state.expenses = state.expenses.filter(x => x.id !== id);
+        // Save changes to LocalStorage
+        saveToLocalStorage();
+        renderAll();
+        showToast('선택하신 내역이 삭제되었어예~');
+      });
+    }
+
+    // Trigger whole reset
+    function openResetConfirm() {
+      openConfirmModal('가계부 전면 초기화', '지금까지 기록한 대만 여행 지출 기록이 전부 다 지워져예! 정말 초기화할까예? 🗑️', () => {
+        state.expenses = [];
+        // Save changes to LocalStorage
+        saveToLocalStorage();
+        renderAll();
+        showToast('가계부의 모든 소비 내역이 말끔히 비워졌어예!');
+      });
+    }
+
+    // Main Render Sequence
+    function renderAll() {
+      const activeDayData = travelDates.find(d => d.date === state.activeTab);
+      
+      // Render Date Tabs Grid (Highlighting Active and Sums)
+      const tabsGrid = document.getElementById('date-tabs-grid');
+      tabsGrid.innerHTML = '';
+
+      travelDates.forEach(t => {
+        const isActive = state.activeTab === t.date;
+        const total = state.expenses
+          .filter(e => e.date === t.date)
+          .reduce((sum, e) => sum + e.amount, 0);
+
+        const btn = document.createElement('button');
+        btn.onclick = () => {
+          state.activeTab = t.date;
+          renderAll();
+        };
+        btn.className = `flex flex-col items-center justify-center p-2.5 rounded-xl transition duration-200 border text-center ${
+          isActive 
+            ? 'bg-teal-600 text-white border-teal-600 shadow-md transform scale-102' 
+            : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
+        }`;
+        
+        btn.innerHTML = `
+          <span class="text-[10px] font-black ${isActive ? 'text-teal-200' : 'text-slate-400'}">${t.day}</span>
+          <span class="text-xs font-bold leading-none mt-0.5">${t.label.split(' ')[0]}</span>
+          <span class="text-[9px] font-extrabold mt-1.5 px-1.5 py-0.5 rounded-full ${
+            isActive ? 'bg-teal-500 text-white' : 'bg-slate-200 text-slate-600'
+          }">${formatTWD(total).replace('NT$ ', '')}</span>
+        `;
+        tabsGrid.appendChild(btn);
+      });
+
+      // Update Form and List Header Labels with Active Date
+      document.getElementById('form-title-date').innerHTML = `<span class="text-teal-600 font-extrabold">${activeDayData.day} (${activeDayData.label})</span> 지출 기록하기`;
+      document.getElementById('list-title-date').innerHTML = `<span class="text-teal-600 font-extrabold">${activeDayData.day} (${activeDayData.label})</span> 지출 상세 내역`;
+      document.getElementById('total-badge-date').textContent = `${activeDayData.day} (${activeDayData.label}) 하루 합계`;
+
+      // Filter active day expenses
+      const activeDayExpenses = state.expenses.filter(e => e.date === state.activeTab);
+      const dayTotal = activeDayExpenses.reduce((sum, e) => sum + e.amount, 0);
+      
+      document.getElementById('item-count-text').textContent = `${activeDayExpenses.length}건의 소비 내역`;
+      document.getElementById('daily-total-twd').textContent = formatTWD(dayTotal);
+      document.getElementById('daily-total-krw').textContent = `(${formatKRW(dayTotal)})`;
+
+      // Populate Daily List Box
+      const listContainer = document.getElementById('daily-items-list');
+      listContainer.innerHTML = '';
+
+      if (activeDayExpenses.length === 0) {
+        listContainer.innerHTML = `
+          <div class="flex flex-col items-center justify-center py-12 text-slate-400">
+            <span class="text-2xl">🌴</span>
+            <p class="text-xs font-bold mt-1.5">이 날은 아직 돈을 안 쓰셨거나 기록이 없어예!</p>
+            <p class="text-[10px] text-slate-300">위 양식에 사용액을 입력해서 첫 소비를 적어보세예~</p>
+          </div>
+        `;
+      } else {
+        activeDayExpenses.forEach(item => {
+          const cat = categories[item.category] || categories.others;
+          const row = document.createElement('div');
+          row.className = "py-3 flex items-center justify-between hover:bg-slate-50/70 rounded-lg px-2 transition group duration-150";
+          row.innerHTML = `
+            <div class="flex items-center gap-3">
+              <!-- Category badge style circle (Tells the category visually) -->
+              <div class="w-9 h-9 ${cat.color} rounded-xl flex items-center justify-center text-xs font-bold shrink-0 shadow-sm" title="${cat.label}">
+                <i class="fa-solid ${cat.icon}"></i>
+              </div>
+              <div>
+                <h4 class="font-bold text-slate-800 text-xs">${item.title}</h4>
+                <div class="flex items-center gap-1.5 mt-0.5">
+                  <!-- Cash/Card Payment Method displayed ONLY as clean Icon -->
+                  <span class="text-xs select-none" title="${item.payment === 'cash' ? '현금 지출' : '카드 지출'}">
+                    ${item.payment === 'cash' ? '💵' : '💳'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Price and control icons -->
+            <div class="flex items-center gap-3">
+              <div class="text-right">
+                <p class="font-black text-slate-800 text-xs">${formatTWD(item.amount)}</p>
+                <p class="text-[9px] text-slate-400 font-bold">${formatKRW(item.amount)}</p>
+              </div>
+              <div class="flex items-center gap-0.5">
+                <button onclick="openEditModal(${item.id})" class="p-1.5 text-slate-300 hover:text-teal-600 hover:bg-slate-100 rounded-lg transition" title="수정">
+                  <i class="fa-solid fa-pen text-[10px]"></i>
+                </button>
+                <button onclick="deleteItem(${item.id})" class="p-1.5 text-slate-300 hover:text-rose-600 hover:bg-slate-100 rounded-lg transition" title="삭제">
+                  <i class="fa-solid fa-trash-can text-[10px]"></i>
+                </button>
+              </div>
+            </div>
+          `;
+          listContainer.appendChild(row);
+        });
+      }
+
+      // ==========================================
+      // GLOBAL STATISTICS: 여행 기간 가계 총정리 (오른쪽 영역 - 예산 요소 완전히 제거)
+      // ==========================================
+      const totalSpent = state.expenses.reduce((sum, item) => sum + item.amount, 0);
+
+      // Total Spent Box (Grand total accrued)
+      document.getElementById('summary-spent-twd').textContent = formatTWD(totalSpent);
+      document.getElementById('summary-spent-krw').textContent = formatKRW(totalSpent);
+
+      // Category Chart Statistics
+      const catTotals = { food: 0, transport: 0, hotel: 0, shopping: 0, sightseeing: 0, others: 0 };
+      state.expenses.forEach(item => {
+        if (catTotals[item.category] !== undefined) {
+          catTotals[item.category] += item.amount;
+        } else {
+          catTotals.others += item.amount;
+        }
+      });
+
+      const chartContainer = document.getElementById('category-chart-container');
+      chartContainer.innerHTML = '';
+
+      // Sort categories by expenditure value descending
+      const sortedCats = Object.keys(catTotals).map(key => {
+        return { key, value: catTotals[key] };
+      }).sort((a, b) => b.value - a.value);
+
+      const maxVal = Math.max(...sortedCats.map(x => x.value), 1);
+
+      sortedCats.forEach(item => {
+        const catMeta = categories[item.key] || categories.others;
+        const percentOfMax = Math.round((item.value / maxVal) * 100);
+        const percentOfTotal = totalSpent > 0 ? Math.round((item.value / totalSpent) * 100) : 0;
+
+        if (item.value > 0) {
+          const row = document.createElement('div');
+          row.className = "space-y-1";
+          row.innerHTML = `
+            <div class="flex justify-between text-[10px] font-extrabold text-slate-600">
+              <span class="flex items-center gap-1">
+                <span>${catMeta.label}</span>
+              </span>
+              <span class="text-slate-800">${formatTWD(item.value)} <span class="text-[9px] text-slate-400 font-bold">(${percentOfTotal}%)</span></span>
+            </div>
+            <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden border border-slate-100/50 shadow-inner">
+              <div class="bg-gradient-to-r ${catMeta.gradient} h-full rounded-full transition-all duration-500 ease-out" style="width: ${percentOfMax}%"></div>
+            </div>
+          `;
+          chartContainer.appendChild(row);
+        }
+      });
+
+      if (totalSpent === 0) {
+        chartContainer.innerHTML = `<p class="text-[10px] text-slate-400 text-center py-3">지출 기록을 등록해 보세예~ 그래프가 나타나예! 📊</p>`;
+      }
+
+      // Cash vs Card Split
+      let cashTotal = 0;
+      let cardTotal = 0;
+      state.expenses.forEach(item => {
+        if (item.payment === 'cash') cashTotal += item.amount;
+        else cardTotal += item.amount;
+      });
+
+      const cashPercent = totalSpent > 0 ? Math.round((cashTotal / totalSpent) * 100) : 0;
+      const cardPercent = totalSpent > 0 ? Math.round((cardTotal / totalSpent) * 100) : 0;
+
+      document.getElementById('payment-cash-total').textContent = formatTWD(cashTotal);
+      document.getElementById('payment-card-total').textContent = formatTWD(cardTotal);
+
+      const ratioBar = document.getElementById('payment-ratio-bar');
+      ratioBar.innerHTML = '';
+
+      if (totalSpent === 0) {
+        ratioBar.innerHTML = `<div class="bg-slate-200 w-full flex items-center justify-center text-slate-400 text-[9px] font-bold">기록 없음</div>`;
+      } else {
+        if (cashPercent > 0) {
+          const cashDiv = document.createElement('div');
+          cashDiv.className = "bg-amber-400 flex items-center justify-center transition-all duration-500 ease-out";
+          cashDiv.style.width = `${cashPercent}%`;
+          cashDiv.textContent = `${cashPercent}%`;
+          ratioBar.appendChild(cashDiv);
+        }
+        if (cardPercent > 0) {
+          const cardDiv = document.createElement('div');
+          cardDiv.className = "bg-blue-500 flex items-center justify-center transition-all duration-500 ease-out";
+          cardDiv.style.width = `${cardPercent}%`;
+          cardDiv.textContent = `${cardPercent}%`;
+          ratioBar.appendChild(cardDiv);
+        }
+      }
+    }
+
+    // Initialize Page
+    window.onload = function() {
+      // Sync exchange rate input value with the loaded state
+      document.getElementById('exchange-rate-input').value = state.exchangeRate;
+      renderAll();
+      convertTwdToKrw(document.getElementById('calc-twd').value);
+    }
+  </script>
+</body>
+</html>
